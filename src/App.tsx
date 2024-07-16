@@ -3,6 +3,7 @@ import SignUp from "./components/sign-up/SignUp.tsx";
 import SignIn from "./components/sign-in/SignIn.tsx";
 import HomePage from "./pages/home/HomePage.tsx";
 import {createBrowserRouter, RouterProvider, RouteObject} from "react-router-dom";
+import NotFound from "./pages/not-found/NotFound.tsx";
 
 
 function App(routes: RouteObject[], locationArg?: Partial<Location> | string) {
@@ -21,7 +22,12 @@ function App(routes: RouteObject[], locationArg?: Partial<Location> | string) {
         {
             path: "/sign-in",
             element: <SignIn/>,
+        },
+        {
+            path: "*",
+            element: <NotFound/>,
         }
+
     ])
 
 

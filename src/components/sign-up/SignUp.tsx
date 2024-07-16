@@ -3,34 +3,45 @@ import {Button, Form, Input} from 'antd';
 import {useNavigate} from 'react-router-dom'
 import back from '../../assets/image/background-effect.png'
 import Base_url from "../../routes/ApiConfig.ts";
+import CryptoJS from "crypto-js";
 
 interface SignUpFormValues {
-    username: string;
-    password: string;
+    name: string;
+    email: string;
     key: string;
     secret: string;
-
 }
 
 export default function SignUp() {
-
 
     const navigate = useNavigate()
     const onFinish = async (values: SignUpFormValues) => {
         console.log('Received values of form: ', values);
 
-        const queryString = new URLSearchParams(values as Record<string, string>).toString();
         const url = `${Base_url}/signup`;
+        const method = 'POST';
+        const body = JSON.stringify(values);
+        const secret = values.secret;
 
+        const signstr = `${method}+${url}+${body}+${secret}`;
+        const sign = CryptoJS.MD5(signstr).toString();
+
+        console.log(`Sign ${sign}`)
+
+        localStorage.setItem('token', JSON.stringify({
+            sign: sign,
+            key: values.key
+        }));
 
         try {
             const response = await fetch(url, {
-                method: 'POST',
+                method: method,
                 headers: {
                     'Content-Type': 'application/json',
-                    'Sign': "2892678138d8d793a28fc49055095d8b"
+                    'Key': values.key,
+                    'Sign': sign
                 },
-                body: JSON.stringify(values)
+                body: body
             });
 
             if (!response.ok) {
@@ -39,15 +50,7 @@ export default function SignUp() {
             const data = await response.json();
             console.log('Data received from server:', data);
 
-            localStorage.setItem('token', JSON.stringify({
-                sign: '2892678138d8d793a28fc49055095d8b',
-                key: values.key
-            }))
-
-            // saveToken(data.sign)
-            // saveToken(data.key)
-
-            navigate('/')
+            navigate('/');
         } catch (error) {
             console.error('There was a problem with your fetch operation:', error);
         }
@@ -58,7 +61,7 @@ export default function SignUp() {
             <img className={'fixed z-[-10]'} src={back} alt=""/>
             <div className="container flex justify-center items-center h-screen">
                 <div className="form-container bg-white px-7 py-12 rounded-[12px] shadow-lg lg:w-[430px]">
-                    <h2 className=" text-center text-[36px] font-bold pb-4">Sign Up</h2>
+                    <h2 className="text-center text-[36px] font-bold pb-4">Sign Up</h2>
                     <Form
                         name="signup"
                         initialValues={{remember: true}}
@@ -66,7 +69,7 @@ export default function SignUp() {
                     >
                         <p className={'font-medium pb-1'}>Username</p>
                         <Form.Item
-                            name="username"
+                            name="name"
                             rules={[{required: true, message: 'Please input your Username!'}]}
                         >
                             <Input placeholder="Username" rootClassName={'hover:shadow'}/>
@@ -74,21 +77,21 @@ export default function SignUp() {
                         <p className={'font-medium pb-1'}>Email</p>
                         <Form.Item
                             name="email"
-                            rules={[{required: true, message: 'Email!'}]}
+                            rules={[{required: true, message: 'Please input your Email!'}]}
                         >
                             <Input placeholder="Enter your email"/>
                         </Form.Item>
                         <p className={'font-medium pb-1'}>Key</p>
                         <Form.Item
                             name="key"
-                            rules={[{required: true, message: ' Key!'}]}
+                            rules={[{required: true, message: 'Please input your Key!'}]}
                         >
                             <Input.Password placeholder="Enter your key"/>
                         </Form.Item>
                         <p className={'font-medium pb-1'}>Secret Key</p>
                         <Form.Item
-                            name="secretkey"
-                            rules={[{required: true, message: 'Secret Key'}]}
+                            name="secret"
+                            rules={[{required: true, message: 'Please input your Secret Key!'}]}
                         >
                             <Input.Password placeholder="Enter your secret key"/>
                         </Form.Item>
@@ -100,13 +103,12 @@ export default function SignUp() {
                     </Form>
                     <p className="sign-in-link">
                         Already signed up?{' '}
-                        <a href="/sign-in" className="text-[#6200EE] ">
+                        <a href="/sign-in" className="text-[#6200EE]">
                             Go to sign in.
                         </a>
                     </p>
                 </div>
             </div>
-
         </div>
     );
 }
