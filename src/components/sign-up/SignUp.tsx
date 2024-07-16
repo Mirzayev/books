@@ -3,7 +3,6 @@ import {Button, Form, Input} from 'antd';
 import {useNavigate} from 'react-router-dom'
 import back from '../../assets/image/background-effect.png'
 import Base_url from "../../routes/ApiConfig.ts";
-import CryptoJS from "crypto-js";
 
 interface SignUpFormValues {
     name: string;
