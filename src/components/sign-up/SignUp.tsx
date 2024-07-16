@@ -10,6 +10,8 @@ interface SignUpFormValues {
     email: string;
     key: string;
     secret: string;
+    back: string;
+
 }
 
 export default function SignUp() {
@@ -23,10 +25,9 @@ export default function SignUp() {
         const body = JSON.stringify(values);
         const secret = values.secret;
 
-        const signstr = `${method}+${url}+${body}+${secret}`;
-        const sign = CryptoJS.MD5(signstr).toString();
 
-        console.log(`Sign ${sign}`)
+        let sign = url + method + body + secret
+
 
         localStorage.setItem('token', JSON.stringify({
             sign: sign,
